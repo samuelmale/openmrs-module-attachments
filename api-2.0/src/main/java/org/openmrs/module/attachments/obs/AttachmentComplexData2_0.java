@@ -1,5 +1,7 @@
 package org.openmrs.module.attachments.obs;
 
+import java.util.ArrayList;
+
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.module.attachments.AttachmentsConstants;
 import org.openmrs.obs.ComplexData;
@@ -39,5 +41,11 @@ public class AttachmentComplexData2_0 extends BaseComplexData implements Attachm
 	@Override
 	public ComplexData asComplexData() {
 		return this;
+	}
+	
+	public void testJava8Compatibility() {
+		new ArrayList<String>().forEach(str -> {
+			
+		});
 	}
 }
