@@ -23,16 +23,20 @@ import org.openmrs.Visit;
 import org.openmrs.api.ObsService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.attachments.AttachmentsConstants;
+import org.openmrs.module.attachments.AttachmentsConstants.ContentFamily;
 import org.openmrs.module.attachments.AttachmentsContext;
+import org.openmrs.module.attachments.obs.ComplexDataHelper1_10;
 import org.openmrs.module.attachments.obs.TestHelper;
 import org.openmrs.module.webservices.rest.SimpleObject;
 import org.openmrs.module.webservices.rest.web.response.IllegalRequestException;
 import org.openmrs.module.webservices.rest.web.v1_0.controller.MainResourceControllerTest;
 import org.openmrs.obs.ComplexData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 public class AttachmentRestController1_10Test extends MainResourceControllerTest {
 	
@@ -44,6 +48,8 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 	
 	@Autowired
 	private AttachmentsContext attachmentsContext;
+	
+	ComplexDataHelper1_10 complexDataHelper = new ComplexDataHelper1_10();
 	
 	private byte[] randomData = new byte[20];
 	
@@ -110,10 +116,44 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		assertEquals(editedComment, comment);
 	}
 	
+
+	@Test
+	public void shouldGetAttachment() throws Exception {
+		MockHttpServletRequest req = request(RequestMethod.GET, getURI() + "/" + getUuid());
+		SimpleObject result = deserialize(handle(req));
+		
+		Assert.assertEquals(getUuid(), PropertyUtils.getProperty(result, "uuid"));
+		Assert.assertNotNull(PropertyUtils.getProperty(result, "comment"));
+		Assert.assertNotNull(PropertyUtils.getProperty(result, "bytesMimeType"));
+		Assert.assertNotNull(PropertyUtils.getProperty(result, "bytesContentFamily"));
+	}
+	
+
+	@Test
+	public void shouldGetBytesMimeTypeOfAttachment() throws Exception {
+		MockHttpServletRequest req = request(RequestMethod.GET, getURI() + "/" + getUuid());
+		SimpleObject result = deserialize(handle(req));
+		
+		ComplexData complexData = obs.getComplexData();
+		
+		assertEquals(result.get("bytesMimeType"),complexDataHelper.getContentType(complexData));
+	}
+	
+	@Test
+	public void shouldGetBytesContentFamilyOfAttachment() throws Exception {
+		MockHttpServletRequest req = request(RequestMethod.GET, getURI() + "/" + getUuid());
+		SimpleObject result = deserialize(handle(req));
+		
+		ComplexData complexData = obs.getComplexData();
+		
+		ContentFamily contentFamily = AttachmentsContext.getContentFamily(complexDataHelper.getContentType(complexData).toString());
+		
+		assertEquals(result.get("bytesContentFamily"),contentFamily.toString());
+	}
+	
 	@Test
 	public void deleteAttachment_shouldVoidObs() throws Exception {
-		// Setup
-		File file = new File(testHelper.getTestComplexObsFilePath());
+		new File(testHelper.getTestComplexObsFilePath());
 		
 		// Replay
 		handle(newDeleteRequest(getURI() + "/" + getUuid()));
@@ -299,8 +339,7 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		request.addParameter("encounter", encounter.getUuid());
 		request.addParameter("fileCaption", fileCaption);
 		
-		// Replay
-		SimpleObject response = deserialize(handle(request));
+		deserialize(handle(request));
 	}
 	
 	@Test(expected = IllegalRequestException.class)
@@ -321,8 +360,7 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		request.addParameter("visit", visit.getUuid());
 		request.addParameter("fileCaption", fileCaption);
 		
-		// Replay
-		SimpleObject response = deserialize(handle(request));
+		deserialize(handle(request));
 	}
 	
 	@Test
@@ -360,4 +398,5 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		Assert.assertEquals(downloadResponse.getHeader("File-Ext"), fileExtension);
 		
 	}
+
 }
