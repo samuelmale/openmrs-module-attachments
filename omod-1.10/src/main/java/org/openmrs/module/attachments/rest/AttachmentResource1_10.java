@@ -102,7 +102,7 @@ public class AttachmentResource1_10 extends DataDelegatingCrudResource<Attachmen
 		String instructions = context.getParameter("instructions");
 		
 		// Verify File Size
-		if (attachmentsContext.getMaxUploadFileSize() * 1024 * 1024 < file.getSize()) {
+		if (attachmentsContext.getMaxUploadFileSize() * 1024 * 1024 < (double)file.getSize()) {
 			throw new IllegalRequestException("The file  exceeds the maximum size");
 		}
 		
