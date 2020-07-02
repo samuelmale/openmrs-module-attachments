@@ -59,7 +59,6 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 	public void setup() throws IOException {
 		testHelper.init();
 		obs = testHelper.getTestComplexObs();
-		// obs = testHelper.saveNormalSizeImageAttachment();
 		new Random().nextBytes(randomData);
 	}
 	
@@ -146,8 +145,7 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		
 		ComplexData complexData = obs.getComplexData();
 		
-		ContentFamily contentFamily = AttachmentsContext
-				.getContentFamily(complexDataHelper.getContentType(complexData));
+		ContentFamily contentFamily = AttachmentsContext.getContentFamily(complexDataHelper.getContentType(complexData));
 		
 		assertEquals(result.get("bytesContentFamily"), contentFamily.toString());
 		assertEquals(result.get("bytesContentFamily"), "OTHER");
@@ -231,7 +229,7 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		// Verify
 		assertNull(obsService.getObsByUuid(obs.getUuid()));
 	}
-
+	
 	@Test
 	public void postAttachment_shouldUploadFileToVisit() throws Exception {
 		String fileCaption = "Test file caption";
@@ -264,7 +262,7 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 			Assert.assertEquals(obs.getEncounter().getEncounterType(), attachmentsContext.getEncounterType());
 		}
 	}
-
+	
 	@Test
 	public void postAttachment_shouldUploadFileAsEncounterless() throws Exception {
 		String fileCaption = "Test file caption";
@@ -294,7 +292,7 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		Assert.assertNull(obs.getEncounter());
 		
 	}
-
+	
 	@Test
 	public void postAttachment_shouldUploadFileToEncounter() throws Exception {
 		String fileCaption = "Test file caption";
@@ -324,7 +322,7 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		Assert.assertArrayEquals(randomData, (byte[]) complexData.getData());
 		Assert.assertEquals(obs.getEncounter().getUuid(), encounter.getUuid());
 	}
-
+	
 	@Test(expected = IllegalRequestException.class)
 	public void postAttachment_shouldThrowWhenVisitAndEncounterDoNotMatch() throws Exception {
 		// Setup
@@ -343,11 +341,10 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		request.addParameter("encounter", encounter.getUuid());
 		request.addParameter("fileCaption", fileCaption);
 		
-		deserialize(handle(request));
-		
-		deserialize(handle(request));
+		// Replay
+		SimpleObject response = deserialize(handle(request));
 	}
-
+	
 	@Test(expected = IllegalRequestException.class)
 	public void postAttachment_shouldNotUploadFileAboveSizeLimit() throws Exception {
 		// Setup
@@ -366,11 +363,10 @@ public class AttachmentRestController1_10Test extends MainResourceControllerTest
 		request.addParameter("visit", visit.getUuid());
 		request.addParameter("fileCaption", fileCaption);
 		
-		deserialize(handle(request));
-		
-		deserialize(handle(request));
+		// Replay
+		SimpleObject response = deserialize(handle(request));
 	}
-
+	
 	@Test
 	public void getAttachmentBytes_shouldDownloadFile() throws Exception {
 		
