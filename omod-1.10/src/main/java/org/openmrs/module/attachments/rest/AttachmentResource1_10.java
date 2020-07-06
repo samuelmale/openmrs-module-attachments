@@ -21,7 +21,6 @@ import org.openmrs.module.attachments.AttachmentsService;
 import org.openmrs.module.attachments.ComplexObsSaver;
 import org.openmrs.module.attachments.obs.Attachment;
 import org.openmrs.module.attachments.obs.ComplexDataHelper;
-import org.openmrs.module.attachments.obs.ComplexDataHelper1_10;
 import org.openmrs.module.attachments.obs.ValueComplex;
 import org.openmrs.module.webservices.rest.web.ConversionUtil;
 import org.openmrs.module.webservices.rest.web.RequestContext;
@@ -53,7 +52,8 @@ public class AttachmentResource1_10 extends DataDelegatingCrudResource<Attachmen
 	AttachmentsContext attachmentsContext = Context.getRegisteredComponent(AttachmentsConstants.COMPONENT_ATT_CONTEXT,
 	    AttachmentsContext.class);
 	
-	ComplexDataHelper complexDataHelper = new ComplexDataHelper1_10();
+	ComplexDataHelper complexDataHelper = Context.getRegisteredComponent(AttachmentsConstants.COMPONENT_COMPLEXDATA_HELPER,
+	    ComplexDataHelper.class);
 	
 	@Override
 	public Attachment newDelegate() {
